@@ -52,10 +52,10 @@ int main(int argc, char *argv[]) {
         return EXIT_FAILURE;
     }
     
-    // Skip the '--' prefix
+   
     operation += 2;
 
-    // Perform the requested operation
+   
     if (strcmp(operation, "add") == 0) {
         add_treasure(hunt_id);
     } else if (strcmp(operation, "list") == 0) {
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
 }
 
-// Check if a hunt directory exists
+
 int hunt_exists(const char *hunt_id) {
     struct stat st;
     char path[MAX_PATH_LEN];
@@ -90,7 +90,7 @@ int hunt_exists(const char *hunt_id) {
     return stat(path, &st) == 0 && S_ISDIR(st.st_mode);
 }
 
-// Ensure hunt directory exists
+
 void ensure_hunt_dir(const char *hunt_id) {
     if (!hunt_exists(hunt_id)) {
         if (mkdir(hunt_id, 0755) != 0) {
@@ -99,7 +99,7 @@ void ensure_hunt_dir(const char *hunt_id) {
         }
         printf("Created new hunt: %s\n", hunt_id);
         
-        // Create log file
+        
         char log_path[MAX_PATH_LEN];
         snprintf(log_path, sizeof(log_path), "%s/%s", hunt_id, LOG_FILE);
         int log_fd = open(log_path, O_WRONLY | O_CREAT, 0644);
@@ -109,32 +109,32 @@ void ensure_hunt_dir(const char *hunt_id) {
         }
         close(log_fd);
         
-        // Create symlink to log file
+       
         create_symlink(hunt_id);
     }
 }
 
-// Create a symbolic link to the log file
+
 void create_symlink(const char *hunt_id) {
     char log_path[MAX_PATH_LEN];
     char symlink_path[MAX_PATH_LEN];
     
-    // Source log file path
+   
     snprintf(log_path, sizeof(log_path), "%s/%s", hunt_id, LOG_FILE);
     
-    // Symlink path
+   
     snprintf(symlink_path, sizeof(symlink_path), "%s-%s", LOG_FILE, hunt_id);
     
-    // Remove existing symlink if it exists
+    
     unlink(symlink_path);
     
-    // Create new symlink
+   
     if (symlink(log_path, symlink_path) != 0) {
         fprintf(stderr, "Failed to create symbolic link: %s\n", strerror(errno));
     }
 }
 
-// Log an operation
+
 void log_operation(const char *hunt_id, const char *operation) {
     char log_path[MAX_PATH_LEN];
     snprintf(log_path, sizeof(log_path), "%s/%s", hunt_id, LOG_FILE);
@@ -145,17 +145,17 @@ void log_operation(const char *hunt_id, const char *operation) {
         return;
     }
     
-    // Get current time
+    
     time_t now = time(NULL);
     struct tm *tm_info = localtime(&now);
     char timestamp[26];
     strftime(timestamp, sizeof(timestamp), "%Y-%m-%d %H:%M:%S", tm_info);
     
-    // Format log entry
+   
     char log_entry[512];
     snprintf(log_entry, sizeof(log_entry), "[%s] %s\n", timestamp, operation);
     
-    // Write log entry
+   
     if (write(log_fd, log_entry, strlen(log_entry)) == -1) {
         fprintf(stderr, "Failed to write to log file: %s\n", strerror(errno));
     }
@@ -163,18 +163,17 @@ void log_operation(const char *hunt_id, const char *operation) {
     close(log_fd);
 }
 
-// Get the next available treasure ID
 int get_next_id(const char *hunt_id) {
     char file_path[MAX_PATH_LEN];
     snprintf(file_path, sizeof(file_path), "%s/%s", hunt_id, TREASURE_FILE);
     
     int fd = open(file_path, O_RDONLY);
     if (fd == -1) {
-        // File doesn't exist, start with ID 1
+      
         return 1;
     }
     
-    // Count the number of treasures
+  
     int count = 0;
     Treasure treasure;
     
@@ -186,22 +185,22 @@ int get_next_id(const char *hunt_id) {
     return count + 1;
 }
 
-// Add a new treasure to a hunt
+
 void add_treasure(const char *hunt_id) {
-    // Ensure hunt directory exists
+   
     ensure_hunt_dir(hunt_id);
     
     char file_path[MAX_PATH_LEN];
     snprintf(file_path, sizeof(file_path), "%s/%s", hunt_id, TREASURE_FILE);
     
-    // Open treasure file in append mode
+    
     int fd = open(file_path, O_WRONLY | O_APPEND | O_CREAT, 0644);
     if (fd == -1) {
         fprintf(stderr, "Failed to open treasure file: %s\n", strerror(errno));
         return;
     }
     
-    // Create a new treasure
+   
     Treasure treasure;
     treasure.id = get_next_id(hunt_id);
     
