@@ -15,7 +15,6 @@
 #define TREASURE_FILE "treasures.dat"
 #define LOG_FILE "logged_hunt"
 
-// Structure to represent a treasure
 typedef struct {
     int id;
     char username[MAX_USERNAME_LEN];
@@ -25,7 +24,7 @@ typedef struct {
     int value;
 } Treasure;
 
-// Function prototypes
+
 void add_treasure(const char *hunt_id);
 void list_treasures(const char *hunt_id);
 void view_treasure(const char *hunt_id, int treasure_id);
